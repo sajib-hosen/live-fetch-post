@@ -1,6 +1,7 @@
 import { Button, Card, CardContent, Grid, Pagination, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export interface InitPost {
     title: string,
@@ -19,6 +20,7 @@ const Home = () => {
     const [allPost, setAllPost] = useState<any>({})
     const [page, setPage] = useState(1);
     const [pagePost, setPagePost] = useState<InitPost[]>([]);
+    const navigate = useNavigate();
     
     useEffect(() => {  // calling the API after each 10 second by changing state.
       const timer = setInterval(()=>{
@@ -51,8 +53,6 @@ const Home = () => {
     },[allPost])
     //------------------------------------------------------------------------------
 
-
-
     // on page change ==============================================================
     const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value);
@@ -66,6 +66,10 @@ const Home = () => {
     //-------------------------------------------------------------------------------
     console.log(pagePost)
 
+    const getDetails = (post: InitPost) => {
+        navigate('/details', {state:{ post }})
+    }
+
     return (
         <div>
              <Box sx={{ flexGrow: 1, margin:3 }}>
@@ -77,7 +81,7 @@ const Home = () => {
                             {eachObj.author && <Typography>Author: {eachObj.author.toUpperCase()}</Typography>}
                             {eachObj.title && <Typography>Title: {eachObj.title}</Typography>}
                             {eachObj.comment_text && <Typography>Comment: {eachObj.comment_text.slice(0, 200)} {eachObj.story_url && <a href={eachObj.story_url} target="_blank" >Read Story</a> }</Typography>}
-                            <Button variant='outlined' >Details</Button>
+                            <Button variant='outlined' onClick={()=>{getDetails(eachObj)}} >Details</Button>
                         </CardContent>
                         </Card>
                     </Grid>
