@@ -99,11 +99,11 @@ const Home = () => {
                     <TableBody>
                         {pagePost && pagePost.map((eachObj: InitPost) => (
                             <TableRow key={eachObj.objectID} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                            <TableCell align="center" component="th" scope="row">{eachObj.title && eachObj.title.slice(0, 10)}</TableCell>
-                            <TableCell align="center">{eachObj.story_url && eachObj.story_url.slice(0, 20)}</TableCell>
-                            <TableCell align="center">{eachObj.comment_text && eachObj.comment_text.slice(0, 20)}</TableCell>
-                            <TableCell align="center">{eachObj.story_url && eachObj.story_url.slice(0, 20)}</TableCell>
-                            <TableCell align="center"><Button variant='outlined' onClick={()=>{getDetails(eachObj)}} >Details</Button></TableCell>
+                                <TableCell align="center" component="th" scope="row">{eachObj.title && eachObj.title.slice(0, 10)}</TableCell>
+                                <TableCell align="center">{eachObj.story_url && eachObj.story_url.slice(0, 20)}</TableCell>
+                                <TableCell align="center">{eachObj.comment_text && eachObj.comment_text.slice(0, 20)}</TableCell>
+                                <TableCell align="center">{eachObj.author && eachObj.author.slice(0, 20)}</TableCell>
+                                <TableCell align="center"><Button variant='outlined' onClick={()=>{getDetails(eachObj)}} >Details</Button></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
