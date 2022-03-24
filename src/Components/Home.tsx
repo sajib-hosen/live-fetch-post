@@ -16,7 +16,7 @@ export interface InitPost {
 const Home = () => {
     const [keyCall, setKeyCall] = useState<number>(0)
     const [pageCount, setPageCount] = useState<number>(0)
-    const [timerKey, setTimerKey] = useState<NodeJS.Timer | null>(null) // interval key passing to anothe useEffect to conditionaly stop
+    // const [timerKey, setTimerKey] = useState<NodeJS.Timer | null>(null) // interval key passing to anothe useEffect to conditionaly stop
     const [allPost, setAllPost] = useState<any>({})
     const [page, setPage] = useState(1);
     const [pagePost, setPagePost] = useState<InitPost[]>([]);
@@ -27,8 +27,6 @@ const Home = () => {
       const timer = setInterval(()=>{
         setKeyCall(Date.now())
       }, 10000)
-
-      setTimerKey(timer) //
     }, []) 
 
     useEffect(()=>{  // fetching data after every 10 second.
@@ -75,7 +73,6 @@ const Home = () => {
         }
     },[ page ])
     //-------------------------------------------------------------------------------
-    // console.log(isLoading, pageCount, allPost[`${pageCount}`])
 
     const getDetails = (post: InitPost) => {
         navigate('/details', {state:{ post }})
@@ -93,17 +90,15 @@ const Home = () => {
                         <TableCell align="center">URL</TableCell>
                         <TableCell align="center">Created At</TableCell>
                         <TableCell align="center">Author</TableCell>
-                        <TableCell align="center">Action</TableCell>
                     </TableRow>
                     </TableHead>
                     <TableBody>
                         {pagePost && pagePost.map((eachObj: InitPost) => (
-                            <TableRow key={eachObj.objectID} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                            <TableRow onClick={()=>{getDetails(eachObj)}} key={eachObj.objectID} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                                 <TableCell align="center" component="th" scope="row">{eachObj.title && eachObj.title.slice(0, 10)}</TableCell>
                                 <TableCell align="center">{eachObj.story_url && eachObj.story_url.slice(0, 20)}</TableCell>
                                 <TableCell align="center">{eachObj.comment_text && eachObj.comment_text.slice(0, 20)}</TableCell>
                                 <TableCell align="center">{eachObj.author && eachObj.author.slice(0, 20)}</TableCell>
-                                <TableCell align="center"><Button variant='outlined' onClick={()=>{getDetails(eachObj)}} >Details</Button></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -112,7 +107,7 @@ const Home = () => {
             </Box>
             </div> }
             <Box display='flex' justifyContent='center' alignItems='center' sx={{ margin: 4 }} >
-                <Pagination page={page} onChange={handleChange} count={Object.keys(allPost).length} color="secondary" />
+                { Object.keys(allPost).length ? <Pagination page={page} onChange={handleChange} count={Object.keys(allPost).length} color="secondary" /> : "" }
             </Box>
         </div>
     );
