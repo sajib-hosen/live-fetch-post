@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, Grid, Pagination, Typography } from '@mui/material';
+import { Button, Card, CardContent, Grid, Pagination, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,7 @@ const Home = () => {
     const [page, setPage] = useState(1);
     const [pagePost, setPagePost] = useState<InitPost[]>([]);
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(true)
     
     useEffect(() => {  // calling the API after each 10 second by changing state.
       const timer = setInterval(()=>{
@@ -31,19 +32,29 @@ const Home = () => {
     }, []) 
 
     useEffect(()=>{  // fetching data after every 10 second.
+        setIsLoading(true)
         fetch(`https://hn.algolia.com/api/v1/search_by_date?query=${pageCount}`)
         .then( res => res.json())
         .then(data =>{
             setAllPost({...allPost, [pageCount]: data.hits})
         })
-        setPageCount(pageCount + 1) //set up page number
+        .catch((error)=>{
+            console.log(pageCount, error.message)
+        })
+        setIsLoading(false)
+    },[keyCall])
 
-        if(pageCount > 19){  // conditionaly stopping the setInterval when we got data for 20 times
-            if(timerKey){
-                clearInterval(timerKey)
-            }
+    useEffect(()=>{ // determining or set the page number what will be page number
+        setPageCount(Object.keys(allPost).length)
+        if(!Object.keys(allPost).length){
+            setIsLoading(true)
+            console.log('loading...')
         }
-    },[ keyCall ])
+        else{
+            setIsLoading(false)
+        }
+        console.log('calling for:', Object.keys(allPost).length, allPost)
+    },[allPost])
 
     // for initial "pagePost set" randering ========================================
     useEffect(()=>{
@@ -64,7 +75,7 @@ const Home = () => {
         }
     },[ page ])
     //-------------------------------------------------------------------------------
-    console.log(pagePost)
+    // console.log(isLoading, pageCount, allPost[`${pageCount}`])
 
     const getDetails = (post: InitPost) => {
         navigate('/details', {state:{ post }})
@@ -72,24 +83,36 @@ const Home = () => {
 
     return (
         <div>
-             <Box sx={{ flexGrow: 1, margin:3 }}>
-                <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-                    {pagePost && pagePost.map((eachObj: InitPost) => (
-                    <Grid item xs={2} sm={4} md={4} key={eachObj.objectID}>
-                        <Card>
-                        <CardContent>
-                            {eachObj.author && <Typography>Author: {eachObj.author.toUpperCase()}</Typography>}
-                            {eachObj.title && <Typography>Title: {eachObj.title}</Typography>}
-                            {eachObj.comment_text && <Typography>Comment: {eachObj.comment_text.slice(0, 200)} {eachObj.story_url && <a href={eachObj.story_url} target="_blank" >Read Story</a> }</Typography>}
-                            <Button variant='outlined' onClick={()=>{getDetails(eachObj)}} >Details</Button>
-                        </CardContent>
-                        </Card>
-                    </Grid>
-                    ))}
-                </Grid>
+            {isLoading ? 'Loading...' : <div>
+            <Box margin='6'>
+            <TableContainer>
+                <Table sx={{ minWidth: 150 }} size="small" aria-label="a dense table">
+                    <TableHead>
+                    <TableRow>
+                        <TableCell align="center">Title</TableCell>
+                        <TableCell align="center">URL</TableCell>
+                        <TableCell align="center">Created At</TableCell>
+                        <TableCell align="center">Author</TableCell>
+                        <TableCell align="center">Action</TableCell>
+                    </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {pagePost && pagePost.map((eachObj: InitPost) => (
+                            <TableRow key={eachObj.objectID} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                            <TableCell align="center" component="th" scope="row">{eachObj.title && eachObj.title.slice(0, 10)}</TableCell>
+                            <TableCell align="center">{eachObj.story_url && eachObj.story_url.slice(0, 20)}</TableCell>
+                            <TableCell align="center">{eachObj.comment_text && eachObj.comment_text.slice(0, 20)}</TableCell>
+                            <TableCell align="center">{eachObj.story_url && eachObj.story_url.slice(0, 20)}</TableCell>
+                            <TableCell align="center"><Button variant='outlined' onClick={()=>{getDetails(eachObj)}} >Details</Button></TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                </TableContainer>
             </Box>
+            </div> }
             <Box display='flex' justifyContent='center' alignItems='center' sx={{ margin: 4 }} >
-                <Pagination page={page} onChange={handleChange} count={pageCount} color="secondary" />
+                <Pagination page={page} onChange={handleChange} count={Object.keys(allPost).length} color="secondary" />
             </Box>
         </div>
     );
