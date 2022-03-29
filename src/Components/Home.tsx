@@ -16,18 +16,19 @@ export interface InitPost {
 const Home = () => {
     const [keyCall, setKeyCall] = useState<number>(0)
     const [pageCount, setPageCount] = useState<number>(0)
-    // const [timerKey, setTimerKey] = useState<NodeJS.Timer | null>(null) // interval key passing to anothe useEffect to conditionaly stop
     const [allPost, setAllPost] = useState<any>({})
     const [page, setPage] = useState(1);
     const [pagePost, setPagePost] = useState<InitPost[]>([]);
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true)
     
+
     useEffect(() => {  // calling the API after each 10 second by changing state.
       const timer = setInterval(()=>{
         setKeyCall(Date.now())
       }, 10000)
     }, []) 
+
 
     useEffect(()=>{  // fetching data after every 10 second.
         setIsLoading(true)
@@ -42,6 +43,7 @@ const Home = () => {
         setIsLoading(false)
     },[keyCall])
 
+
     useEffect(()=>{ // determining or set the page number what will be page number
         setPageCount(Object.keys(allPost).length)
         if(!Object.keys(allPost).length){
@@ -51,16 +53,18 @@ const Home = () => {
         else{
             setIsLoading(false)
         }
-        console.log('calling for:', Object.keys(allPost).length, allPost)
+        // console.log('calling for:', Object.keys(allPost).length, allPost)
     },[allPost])
 
-    // for initial "pagePost set" randering ========================================
+
+    // for initial "pagePost state set" randering ========================================
     useEffect(()=>{
         if(!Boolean(pagePost.length) && allPost['0'] ){
             setPagePost(allPost['0'])
         }
     },[allPost])
     //------------------------------------------------------------------------------
+
 
     // on page change ==============================================================
     const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
@@ -74,14 +78,19 @@ const Home = () => {
     },[ page ])
     //-------------------------------------------------------------------------------
 
-    const getDetails = (post: InitPost) => {
+
+    const getDetails = (post: InitPost) => { //moving to the details page on click
         navigate('/details', {state:{ post }})
     }
 
+
+    console.log(allPost)
+
+
     return (
         <div>
-            {isLoading ? 'Loading...' : <div>
-            <Box margin='6'>
+            {isLoading ? 'Loading...': <div>
+            <Box data-testid='post-box' margin='6'>
             <TableContainer>
                 <Table sx={{ minWidth: 150 }} size="small" aria-label="a dense table">
                     <TableHead>
@@ -95,7 +104,7 @@ const Home = () => {
                     <TableBody>
                         {pagePost && pagePost.map((eachObj: InitPost) => (
                             <TableRow onClick={()=>{getDetails(eachObj)}} key={eachObj.objectID} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                                <TableCell align="center" component="th" scope="row">{eachObj.title && eachObj.title.slice(0, 10)}</TableCell>
+                                <TableCell data-testid={`testId-${eachObj.objectID}`} align="center" component="th" scope="row">{eachObj.title && eachObj.title.slice(0, 10)}</TableCell>
                                 <TableCell align="center">{eachObj.story_url && eachObj.story_url.slice(0, 20)}</TableCell>
                                 <TableCell align="center">{eachObj.comment_text && eachObj.comment_text.slice(0, 20)}</TableCell>
                                 <TableCell align="center">{eachObj.author && eachObj.author.slice(0, 20)}</TableCell>
@@ -107,7 +116,7 @@ const Home = () => {
             </Box>
             </div> }
             <Box display='flex' justifyContent='center' alignItems='center' sx={{ margin: 4 }} >
-                { Object.keys(allPost).length ? <Pagination page={page} onChange={handleChange} count={Object.keys(allPost).length} color="secondary" /> : "" }
+                { Object.keys(allPost).length ? <Pagination data-testid='pagination-testid' page={page} onChange={handleChange} count={Object.keys(allPost).length} color="secondary" /> : "" }
             </Box>
         </div>
     );
